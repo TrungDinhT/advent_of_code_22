@@ -9,7 +9,8 @@ fn main() {
     );
 
     println!(
-        "Day2: Total score if following strategy guide: {}",
-        day2::total_score()
+        "Day2:\n Total score if following blindly strategy guide: {}\n Total score if following correctly strategy guide: {}",
+        day2::part1::total_score(),
+        day2::part2::total_score(),
     );
 }

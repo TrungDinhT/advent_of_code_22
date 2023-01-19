@@ -21,10 +21,7 @@ pub mod part2 {
                 let init_sack = group_of_sacks.next().unwrap();
                 group_of_sacks
                     .fold(init_sack, |result, current| {
-                        result
-                            .intersection(&current)
-                            .map(|&c| c)
-                            .collect::<HashSet<char>>()
+                        result.intersection(&current).copied().collect()
                     })
                     .into_iter()
                     .map(convert_to_priority)

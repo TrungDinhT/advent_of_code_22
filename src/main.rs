@@ -1,5 +1,6 @@
 mod day1;
 mod day2;
+mod day3;
 
 fn main() {
     println!(
@@ -13,4 +14,9 @@ fn main() {
         day2::part1::total_score(),
         day2::part2::total_score(),
     );
+
+    println!(
+        "Day3: Sum of the priorities of wrongly shared items between 2 compartments: {}",
+        day3::sum_shared_items_priorities()
+    )
 }

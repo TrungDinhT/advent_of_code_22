@@ -16,7 +16,8 @@ fn main() {
     );
 
     println!(
-        "Day3: Sum of the priorities of wrongly shared items between 2 compartments: {}",
-        day3::sum_shared_items_priorities()
+        "Day3:\n Sum of the priorities of wrongly shared items between 2 compartments: {}\n Sum of badges priorities: {}",
+        day3::part1::sum_shared_items_priorities(),
+        day3::part2::sum_badges_priorities(),
     )
 }

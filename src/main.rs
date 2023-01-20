@@ -1,6 +1,7 @@
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 fn main() {
     println!(
@@ -19,5 +20,10 @@ fn main() {
         "Day3:\n Sum of the priorities of wrongly shared items between 2 compartments: {}\n Sum of badges priorities: {}",
         day3::part1::sum_shared_items_priorities(),
         day3::part2::sum_badges_priorities(),
-    )
+    );
+
+    println!(
+        "Day4: Number of assignment pairs where one range fully contains the other: {}",
+        day4::part1::nb_pairs_fully_overlapped()
+    );
 }

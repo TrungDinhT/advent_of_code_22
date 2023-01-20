@@ -23,7 +23,8 @@ fn main() {
     );
 
     println!(
-        "Day4: Number of assignment pairs where one range fully contains the other: {}",
-        day4::part1::nb_pairs_fully_overlapped()
+        "Day4:\n Number of assignment pairs where one range fully contains the other: {}\n Number of overlapped assignment pairs: {}",
+        day4::part1::nb_pairs_fully_overlapped(),
+        day4::part2::nb_pairs_overlapped()
     );
 }

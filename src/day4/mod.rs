@@ -3,6 +3,30 @@ use std::fs;
 use std::num::ParseIntError;
 use std::str::FromStr;
 
+pub mod part2 {
+    use super::*;
+
+    pub fn nb_pairs_overlapped() -> usize {
+        nb_pairs_overlapped_impl("src/day4/input.txt")
+    }
+
+    fn nb_pairs_overlapped_impl(file_path: &str) -> usize {
+        fs::read_to_string(file_path)
+            .unwrap()
+            .lines()
+            .filter(|pair| {
+                let (first, second): (Range, Range) = split_in_two(pair, ',').unwrap();
+                first.overlap(&second)
+            })
+            .count()
+    }
+
+    #[test]
+    fn test_nb_pairs_fully_overlapped_impl() {
+        assert_eq!(4, nb_pairs_overlapped_impl("src/day4/input_test.txt"));
+    }
+}
+
 pub mod part1 {
     use super::*;
 
@@ -44,6 +68,10 @@ impl FromStr for Range {
 impl Range {
     fn fully_contains(&self, other: &Self) -> bool {
         self.start <= other.start && self.end >= other.end
+    }
+
+    fn overlap(&self, other: &Self) -> bool {
+        self.end >= other.start && self.start <= other.end
     }
 }
 

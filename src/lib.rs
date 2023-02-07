@@ -34,6 +34,12 @@ pub fn run(day: u8) {
                 day4::part2::nb_pairs_overlapped()
             );
         }
+        5 => {
+            println!(
+                "Day5:\n Top of warehouse stacks after rearrangement: {}",
+                day5::part1::top_crates_after_rearrangement()
+            );
+        }
         _ => {
             panic!("Unimplemented solution for day {}", day);
         }

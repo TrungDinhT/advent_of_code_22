@@ -41,7 +41,7 @@ impl Warehouse {
         let start_drain = self.at(from).len() - n;
         let mut from_stack = self.at_mut(from);
         let crates_to_move = from_stack.drain(start_drain..);
-        self.at_mut(to).extend(crates_to_move);
+        self.at_mut(to).extend(crates_to_move.rev());
     }
 }
 

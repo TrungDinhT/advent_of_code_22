@@ -20,8 +20,8 @@ fn test_top_of_stacks() {
 
 #[test]
 fn test_move_crates_to_other() {
-    let ref_warehouse_after_move_str: &str = "    [D] [N]
-    [C] [Z]
+    let ref_warehouse_after_move_str: &str = "    [D] [Z]
+    [C] [N]
     [M] [P]
  1   2   3 
 ";

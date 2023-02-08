@@ -45,7 +45,7 @@ fn top_crates_after_rearrangement_impl(path: &str, mover_type: warehouse::MoverT
         .split("\n\n")
         .collect_tuple()
     {
-        let mut warehouse: warehouse::Warehouse = warehouse_str.parse().unwrap();
+        let warehouse: warehouse::Warehouse = warehouse_str.parse().unwrap();
         for action_str in actions_str.lines() {
             let action::Action { n_moved, from, to } = action_str.parse().unwrap();
             warehouse.move_crates_between_stacks(n_moved, from, to, mover_type);

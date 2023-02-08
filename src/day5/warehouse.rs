@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use itertools::Itertools;
 use std::cell::{Ref, RefCell, RefMut};
 use std::fmt::{Display, Formatter};
@@ -93,28 +94,21 @@ impl Display for Crate {
     }
 }
 
-#[derive(Debug)]
-pub struct ParseWarehouseError {
-    msg: String,
-}
-
-fn parse_crate_str(crate_str: &str) -> Result<Option<Crate>, ParseWarehouseError> {
+fn parse_crate_str(crate_str: &str) -> Result<Option<Crate>, anyhow::Error> {
     if let Some(('[', payload, ']')) = crate_str.chars().collect_tuple() {
         Ok(Some(Crate { payload }))
     } else if crate_str.chars().all(|c| c.is_whitespace()) {
         Ok(None)
     } else {
-        Err(ParseWarehouseError {
-            msg: format!(
-                "Wrong format for crate_str: {}. It must be [<char>]",
-                crate_str
-            ),
-        })
+        Err(anyhow!(
+            "Wrong format for crate_str: {}. It must be [<char>]",
+            crate_str
+        ))
     }
 }
 
 impl FromStr for Warehouse {
-    type Err = ParseWarehouseError;
+    type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut lines = s.lines().rev();

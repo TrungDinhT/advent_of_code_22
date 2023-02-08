@@ -7,6 +7,12 @@ pub struct Warehouse {
     stacks: Vec<RefCell<Stack>>,
 }
 
+#[derive(Copy, Clone)]
+pub enum MoverType {
+    MoveSingle,
+    MoveMultiple,
+}
+
 type Stack = Vec<Crate>;
 
 #[derive(Copy, Clone)]
@@ -37,11 +43,20 @@ impl Warehouse {
             .collect()
     }
 
-    pub fn move_crates_between_stacks(&self, n: usize, from: usize, to: usize) {
+    pub fn move_crates_between_stacks(
+        &self,
+        n: usize,
+        from: usize,
+        to: usize,
+        mover_type: MoverType,
+    ) {
         let start_drain = self.at(from).len() - n;
         let mut from_stack = self.at_mut(from);
         let crates_to_move = from_stack.drain(start_drain..);
-        self.at_mut(to).extend(crates_to_move.rev());
+        match mover_type {
+            MoverType::MoveSingle => self.at_mut(to).extend(crates_to_move.rev()),
+            MoverType::MoveMultiple => self.at_mut(to).extend(crates_to_move),
+        };
     }
 }
 

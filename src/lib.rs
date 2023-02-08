@@ -36,8 +36,9 @@ pub fn run(day: u8) {
         }
         5 => {
             println!(
-                "Day5:\n Top of warehouse stacks after rearrangement: {}",
-                day5::part1::top_crates_after_rearrangement()
+                "Day5:\n Top of warehouse stacks after rearrangement with M9000: {} \n Top of warehouse stacks after rearrangement with M9001: {} ",
+                day5::part1::top_crates_after_rearrangement(),
+                day5::part2::top_crates_after_rearrangement(),
             );
         }
         _ => {

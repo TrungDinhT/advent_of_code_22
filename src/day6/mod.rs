@@ -1,12 +1,19 @@
+use std::fs;
+
 pub mod part1 {
-    pub fn find_marker_pos(buffer: &str) -> usize {
-        impl1::find_marker_pos(buffer)
+    pub fn find_marker_pos() -> usize {
+        let buffer = super::fs::read_to_string("src/day6/input.txt").unwrap();
+        find_marker_pos_impl(&buffer)
     }
 
-    mod impl1 {
+    pub fn find_marker_pos_impl(buffer: &str) -> usize {
+        impl1::find_marker_pos_impl(buffer)
+    }
+
+    pub mod impl1 {
         use super::super::helpers;
 
-        pub fn find_marker_pos(buffer: &str) -> usize {
+        pub fn find_marker_pos_impl(buffer: &str) -> usize {
             for end in 4..buffer.len() {
                 if !contains_duplicate(&buffer[end - 4..end]) {
                     return end;

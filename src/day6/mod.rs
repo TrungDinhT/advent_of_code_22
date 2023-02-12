@@ -1,46 +1,55 @@
 pub mod part1 {
     pub fn find_marker_pos(buffer: &str) -> usize {
-        for end in 4..buffer.len() {
-            if !contains_duplicate(&buffer[end - 4..end]) {
-                return end;
-            }
-        }
-
-        panic!("Cannot find signal marker in this buffer");
+        impl1::find_marker_pos(buffer)
     }
 
-    fn letter_lookup_bit(c: char) -> usize {
+    mod impl1 {
+        use super::super::helpers;
+
+        pub fn find_marker_pos(buffer: &str) -> usize {
+            for end in 4..buffer.len() {
+                if !contains_duplicate(&buffer[end - 4..end]) {
+                    return end;
+                }
+            }
+
+            panic!("Cannot find signal marker in this buffer");
+        }
+
+        fn contains_duplicate(slice: &str) -> bool {
+            let mut dictionary = Alphabet::new();
+
+            for bit in slice.chars().map(helpers::letter_lookup_bit) {
+                let prev = dictionary.put(bit);
+                if prev {
+                    return true;
+                }
+            }
+
+            false
+        }
+
+        pub struct Alphabet {
+            dict: u32, // u32 has 32 bits, it's more than enough for English alphabet of 26 letters
+        }
+
+        impl Alphabet {
+            pub fn new() -> Self {
+                Self { dict: 0 } // init all the alphabet as unset
+            }
+
+            pub fn put(&mut self, bit: usize) -> bool {
+                let prev_bit_val = (self.dict >> bit) & 0x1;
+                self.dict = self.dict | (1 << bit);
+                prev_bit_val == 1
+            }
+        }
+    }
+}
+
+mod helpers {
+    pub fn letter_lookup_bit(c: char) -> usize {
         c as usize - 'a' as usize + 1
-    }
-
-    fn contains_duplicate(slice: &str) -> bool {
-        use super::Alphabet;
-        let mut dictionary = Alphabet::new();
-
-        for bit in slice.chars().map(letter_lookup_bit) {
-            let prev = dictionary.put(bit);
-            if prev {
-                return true;
-            }
-        }
-
-        false
-    }
-}
-
-struct Alphabet {
-    dict: u32, // u32 has 32 bits, it's more than enough for English alphabet of 26 letters
-}
-
-impl Alphabet {
-    fn new() -> Self {
-        Self { dict: 0 } // init all the alphabet as unset
-    }
-
-    fn put(&mut self, bit: usize) -> bool {
-        let prev_bit_val = (self.dict >> bit) & 0x1;
-        self.dict = self.dict | (1 << bit);
-        prev_bit_val == 1
     }
 }
 

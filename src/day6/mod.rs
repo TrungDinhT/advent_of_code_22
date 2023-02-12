@@ -49,7 +49,7 @@ pub mod part1 {
 
 mod helpers {
     pub fn letter_lookup_bit(c: char) -> usize {
-        c as usize - 'a' as usize + 1
+        c as usize - 'a' as usize
     }
 }
 

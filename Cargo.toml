@@ -7,4 +7,10 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.69"
+criterion = "0.4.0"
+fixedbitset = "0.4.2"
 itertools = "0.10.5"
+
+[[bench]]
+name = "benchmark"
+harness = false

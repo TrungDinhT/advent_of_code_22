@@ -52,6 +52,78 @@ pub mod part1 {
             }
         }
     }
+
+    // !!! This implementation is theoretically faster, because the algorithm does twice less steps than the implementation above
+    // Instead of verifying if the sliding window contains a duplicated letter each time, we only add 1 new letter and remove
+    // the starting letter of previous sliding window. Then we check if the new set of 4 letters are all distinct.
+    // However, when benchmarking, this is ~180 time slower than the above implementation. This is probably due to the fact that
+    // it uses array and memory access instead of bit operations.
+    pub mod impl2 {
+        use crate::day6::helpers::letter_lookup_bit;
+
+        pub fn find_marker_pos_impl(buffer: &str) -> usize {
+            let (mut dict, mut nb_bits_set) = Alphabet::init_with_buffer(&buffer[..3]);
+            let mut start_sliding = 0;
+            for (idx, c) in buffer[3..].chars().enumerate() {
+                let bit = letter_lookup_bit(c);
+                if !dict.put(bit, true) {
+                    nb_bits_set = nb_bits_set + 1;
+                    if nb_bits_set == 4 {
+                        return idx + 4;
+                    }
+                }
+
+                let start_sliding_char = buffer.chars().nth(start_sliding).unwrap();
+                let start_sliding_bit = letter_lookup_bit(start_sliding_char);
+                dict.put(start_sliding_bit, false);
+                if dict.at(start_sliding_bit) == 0 {
+                    nb_bits_set = nb_bits_set - 1;
+                }
+
+                start_sliding = start_sliding + 1;
+            }
+
+            panic!("Cannot find signal marker in this buffer");
+        }
+
+        struct Alphabet {
+            dict: [u8; 27],
+        }
+
+        impl Alphabet {
+            fn new() -> Self {
+                let dict = [0; 27];
+                Self { dict }
+            }
+
+            fn at(&self, idx: usize) -> u8 {
+                self.dict[idx]
+            }
+
+            fn put(&mut self, bit: usize, val: bool) -> bool {
+                let prev = self.dict[bit];
+                self.dict[bit] = if val {
+                    self.dict[bit] + 1
+                } else {
+                    self.dict[bit] - 1
+                };
+                prev > 0
+            }
+
+            fn init_with_buffer(buffer: &str) -> (Self, usize) {
+                let mut dict = Alphabet::new();
+                let nb_bits_preset: usize = buffer
+                    .chars()
+                    .map(|c| {
+                        let bit = letter_lookup_bit(c);
+                        dict.put(bit, true) as usize
+                    })
+                    .sum();
+                let nb_bits_set = buffer.len() - nb_bits_preset;
+                (dict, nb_bits_set)
+            }
+        }
+    }
 }
 
 mod helpers {
@@ -72,9 +144,14 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        use super::part1::find_marker_pos;
+        use super::part1::find_marker_pos_impl;
         for (buffer, ref_result) in TEST_SUITE {
-            assert_eq!(find_marker_pos(buffer), ref_result, "In buffer: {}", buffer);
+            assert_eq!(
+                find_marker_pos_impl(buffer),
+                ref_result,
+                "In buffer: {}",
+                buffer
+            );
         }
     }
 }

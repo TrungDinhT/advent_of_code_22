@@ -1,21 +1,33 @@
+use criterion::Criterion;
 use std::fs;
 
 pub mod part1 {
     pub fn find_marker_pos() -> usize {
         let buffer = super::fs::read_to_string("src/day6/input.txt").unwrap();
-        find_marker_pos_impl(&buffer)
+        super::implementation::find_packet_marker_pos_impl(&buffer)
+    }
+}
+
+pub mod part2 {
+    pub fn find_marker_pos() -> usize {
+        let buffer = super::fs::read_to_string("src/day6/input.txt").unwrap();
+        super::implementation::find_message_marker_pos_impl(&buffer)
+    }
+}
+
+pub mod implementation {
+    pub fn find_packet_marker_pos_impl(buffer: &str) -> usize {
+        impl2::find_marker_pos_impl(buffer, 4)
     }
 
-    pub fn find_marker_pos_impl(buffer: &str) -> usize {
-        impl1::find_marker_pos_impl(buffer)
+    pub fn find_message_marker_pos_impl(buffer: &str) -> usize {
+        impl2::find_marker_pos_impl(buffer, 14)
     }
 
     pub mod impl1 {
-        use super::super::helpers;
-
-        pub fn find_marker_pos_impl(buffer: &str) -> usize {
-            for end in 4..buffer.len() {
-                if !contains_duplicate(&buffer[end - 4..end]) {
+        pub fn find_marker_pos_impl(buffer: &str, block_len: usize) -> usize {
+            for end in block_len..buffer.len() {
+                if !contains_duplicate(&buffer[end - block_len..end]) {
                     return end;
                 }
             }
@@ -26,7 +38,7 @@ pub mod part1 {
         fn contains_duplicate(slice: &str) -> bool {
             let mut dictionary = Alphabet::new();
 
-            for bit in slice.chars().map(helpers::letter_lookup_bit) {
+            for bit in slice.chars().map(super::letter_lookup_bit) {
                 let prev = dictionary.put(bit);
                 if prev {
                     return true;
@@ -55,21 +67,21 @@ pub mod part1 {
 
     // !!! This implementation is theoretically faster, because the algorithm does twice less steps than the implementation above
     // Instead of verifying if the sliding window contains a duplicated letter each time, we only add 1 new letter and remove
-    // the starting letter of previous sliding window. Then we check if the new set of 4 letters are all distinct.
-    // However, when benchmarking, this is ~180 time slower than the above implementation. This is probably due to the fact that
-    // it uses array and memory access instead of bit operations.
+    // the starting letter of previous sliding window. Then we check if the new set of letters are all distinct.
+    // However, when benchmarking with small block_len, this is much slower than the above implementation. This is probably due to the fact that
+    // it uses array and memory access instead of bit operations. However, when the block_len increases, this implementation will scale better.
     pub mod impl2 {
-        use crate::day6::helpers::letter_lookup_bit;
+        use super::letter_lookup_bit;
 
-        pub fn find_marker_pos_impl(buffer: &str) -> usize {
-            let (mut dict, mut nb_bits_set) = Alphabet::init_with_buffer(&buffer[..3]);
+        pub fn find_marker_pos_impl(buffer: &str, block_len: usize) -> usize {
+            let (mut dict, mut nb_bits_set) = Alphabet::init_with_buffer(&buffer[..block_len - 1]);
             let mut start_sliding = 0;
-            for (idx, c) in buffer[3..].chars().enumerate() {
+            for (idx, c) in buffer[block_len - 1..].chars().enumerate() {
                 let bit = letter_lookup_bit(c);
                 if !dict.put(bit, true) {
                     nb_bits_set = nb_bits_set + 1;
-                    if nb_bits_set == 4 {
-                        return idx + 4;
+                    if nb_bits_set == block_len {
+                        return idx + block_len;
                     }
                 }
 
@@ -87,12 +99,12 @@ pub mod part1 {
         }
 
         struct Alphabet {
-            dict: [u8; 27],
+            dict: [u8; 26],
         }
 
         impl Alphabet {
             fn new() -> Self {
-                let dict = [0; 27];
+                let dict = [0; 26];
                 Self { dict }
             }
 
@@ -124,18 +136,14 @@ pub mod part1 {
             }
         }
     }
-}
 
-mod helpers {
-    pub fn letter_lookup_bit(c: char) -> usize {
+    fn letter_lookup_bit(c: char) -> usize {
         c as usize - 'a' as usize
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::part1;
-
     fn test_impl<F>(testsuite: &[(&str, usize)], f: F)
     where
         F: Fn(&str) -> usize,
@@ -154,7 +162,10 @@ mod tests {
             ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10),
             ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11),
         ];
-        test_impl(&TEST_SUITE, part1::find_marker_pos_impl);
+        test_impl(
+            &TEST_SUITE,
+            super::implementation::find_packet_marker_pos_impl,
+        );
     }
 
     #[test]
@@ -166,6 +177,9 @@ mod tests {
             ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
             ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
         ];
-        test_impl(&TEST_SUITE, part2::find_marker_pos_impl);
+        test_impl(
+            &TEST_SUITE,
+            super::implementation::find_message_marker_pos_impl,
+        );
     }
 }

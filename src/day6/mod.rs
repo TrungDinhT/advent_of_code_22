@@ -1,5 +1,6 @@
-use criterion::Criterion;
 use std::fs;
+
+pub mod benchmark;
 
 pub mod part1 {
     pub fn find_marker_pos() -> usize {
@@ -15,13 +16,13 @@ pub mod part2 {
     }
 }
 
-pub mod implementation {
+mod implementation {
     pub fn find_packet_marker_pos_impl(buffer: &str) -> usize {
-        impl2::find_marker_pos_impl(buffer, 4)
+        impl1::find_marker_pos_impl(buffer, 4)
     }
 
     pub fn find_message_marker_pos_impl(buffer: &str) -> usize {
-        impl2::find_marker_pos_impl(buffer, 14)
+        impl1::find_marker_pos_impl(buffer, 14)
     }
 
     pub mod impl1 {
@@ -39,8 +40,7 @@ pub mod implementation {
             let mut dictionary = Alphabet::new();
 
             for bit in slice.chars().map(super::letter_lookup_bit) {
-                let prev = dictionary.put(bit);
-                if prev {
+                if dictionary.put(bit) {
                     return true;
                 }
             }
@@ -48,16 +48,16 @@ pub mod implementation {
             false
         }
 
-        pub struct Alphabet {
+        struct Alphabet {
             dict: u32, // u32 has 32 bits, it's more than enough for English alphabet of 26 letters
         }
 
         impl Alphabet {
-            pub fn new() -> Self {
+            fn new() -> Self {
                 Self { dict: 0 } // init all the alphabet as unset
             }
 
-            pub fn put(&mut self, bit: usize) -> bool {
+            fn put(&mut self, bit: usize) -> bool {
                 let prev_bit_val = (self.dict >> bit) & 0x1;
                 self.dict = self.dict | (1 << bit);
                 prev_bit_val == 1
@@ -69,7 +69,7 @@ pub mod implementation {
     // Instead of verifying if the sliding window contains a duplicated letter each time, we only add 1 new letter and remove
     // the starting letter of previous sliding window. Then we check if the new set of letters are all distinct.
     // However, when benchmarking with small block_len, this is much slower than the above implementation. This is probably due to the fact that
-    // it uses array and memory access instead of bit operations. However, when the block_len increases, this implementation will scale better.
+    // it uses array and memory access instead of bit operations. However, when the block_len increases, this implementation may scale better.
     pub mod impl2 {
         use super::letter_lookup_bit;
 

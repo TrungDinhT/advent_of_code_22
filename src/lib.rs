@@ -46,6 +46,11 @@ pub fn run(day: u8) {
                 day5::part2::top_crates_after_rearrangement(),
             );
         }
+        6 => {
+            println!("Day6: \nNumber of characters to be processed befure first start-of-packet marker: {}",
+            day6::part1::find_marker_pos()
+        )
+        }
         _ => {
             panic!("Unimplemented solution for day {}", day);
         }

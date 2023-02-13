@@ -134,24 +134,38 @@ mod helpers {
 
 #[cfg(test)]
 mod tests {
-    const TEST_SUITE: [(&str, usize); 5] = [
-        ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7),
-        ("bvwbjplbgvbhsrlpgdmjqwftvncz", 5),
-        ("nppdvjthqldpwncqszvftbrmjlhg", 6),
-        ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10),
-        ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11),
-    ];
+    use super::part1;
+
+    fn test_impl<F>(testsuite: &[(&str, usize)], f: F)
+    where
+        F: Fn(&str) -> usize,
+    {
+        for (buffer, ref_result) in testsuite {
+            assert_eq!(f(buffer), *ref_result, "In buffer: {}", buffer);
+        }
+    }
 
     #[test]
     fn test_part1() {
-        use super::part1::find_marker_pos_impl;
-        for (buffer, ref_result) in TEST_SUITE {
-            assert_eq!(
-                find_marker_pos_impl(buffer),
-                ref_result,
-                "In buffer: {}",
-                buffer
-            );
-        }
+        const TEST_SUITE: [(&str, usize); 5] = [
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 7),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 5),
+            ("nppdvjthqldpwncqszvftbrmjlhg", 6),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11),
+        ];
+        test_impl(&TEST_SUITE, part1::find_marker_pos_impl);
+    }
+
+    #[test]
+    fn test_part2() {
+        const TEST_SUITE: [(&str, usize); 5] = [
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", 23),
+            ("nppdvjthqldpwncqszvftbrmjlhg", 23),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26),
+        ];
+        test_impl(&TEST_SUITE, part2::find_marker_pos_impl);
     }
 }

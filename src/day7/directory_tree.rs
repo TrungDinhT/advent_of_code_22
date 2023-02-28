@@ -1,51 +1,58 @@
-struct NodeArena {
-    elements: Vec<Node>,
+pub struct NodeArena {
+    pub elements: Vec<Node>,
 }
 
-struct DirNode {
-    id: usize,
-    parent_id: Option<usize>,
+#[derive(Debug)]
+pub struct DirNode {
+    pub id: usize,
+    pub parent_id: Option<usize>,
+    pub name: String,
 }
 
-struct FileNode {
-    id: usize,
-    parent_id: usize,
-    size: FileSize,
+#[derive(Debug)]
+pub struct FileNode {
+    pub id: usize,
+    pub parent_id: usize,
+    pub size: usize,
+    pub name: String,
 }
 
-#[derive(Eq, PartialEq, Debug, Copy, Clone)]
-struct FileSize(usize);
-
-enum Node {
+#[derive(Debug)]
+pub enum Node {
     DIR(DirNode),
     FILE(FileNode),
 }
 
 impl NodeArena {
-    fn new() -> Self {
+    pub fn new() -> Self {
         NodeArena { elements: vec![] }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.elements.len()
     }
 
-    fn node(&self, id: usize) -> &Node {
+    pub fn node(&self, id: usize) -> &Node {
         &self.elements[id]
     }
 
-    fn add_dir(&mut self, parent_id: Option<usize>) -> usize {
+    pub fn add_dir(&mut self, parent_id: Option<usize>, name: String) -> usize {
         let id = self.elements.len();
-        self.elements.push(Node::DIR(DirNode { id, parent_id }));
+        self.elements.push(Node::DIR(DirNode {
+            id,
+            parent_id,
+            name,
+        }));
         id
     }
 
-    fn add_file(&mut self, parent_id: usize, size: FileSize) -> usize {
+    pub fn add_file(&mut self, parent_id: usize, size: usize, name: String) -> usize {
         let id = self.elements.len();
         self.elements.push(Node::FILE(FileNode {
             id,
             parent_id,
             size,
+            name,
         }));
         id
     }
@@ -59,28 +66,34 @@ mod tests {
     fn create_and_construct_node_arena() {
         let mut node_arena = NodeArena::new();
 
-        let root_node_id = node_arena.add_dir(None);
+        let root_node_name = String::from("root_node");
+        let root_node_id = node_arena.add_dir(None, root_node_name.clone());
         assert_eq!(node_arena.len(), 1);
 
         if let Node::DIR(root_node) = node_arena.node(root_node_id) {
             assert_eq!(root_node.id, 0);
             assert_eq!(root_node.parent_id, None);
+            assert_eq!(root_node.name, root_node_name);
 
-            let second_dir_id = node_arena.add_dir(Some(root_node.id));
+            let second_dir_name = String::from("second_dir");
+            let second_dir_id = node_arena.add_dir(Some(root_node.id), second_dir_name.clone());
             assert_eq!(node_arena.len(), 2);
 
             if let Node::DIR(second_dir) = node_arena.node(second_dir_id) {
                 assert_eq!(second_dir.id, 1);
                 assert_eq!(second_dir.parent_id, Some(0));
+                assert_eq!(second_dir.name, second_dir_name);
 
-                let file_size = FileSize(100);
-                let file_id = node_arena.add_file(second_dir_id, file_size);
+                let file_size = 100;
+                let file_name = String::from("file.txt");
+                let file_id = node_arena.add_file(second_dir_id, file_size, file_name.clone());
                 assert_eq!(node_arena.len(), 3);
 
                 if let Node::FILE(file) = node_arena.node(file_id) {
                     assert_eq!(file.id, 2);
                     assert_eq!(file.parent_id, second_dir_id);
                     assert_eq!(file.size, file_size);
+                    assert_eq!(file.name, file_name);
                 } else {
                     assert!(false, "this has to be a file node");
                 }

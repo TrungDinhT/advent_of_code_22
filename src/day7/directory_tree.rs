@@ -7,6 +7,7 @@ pub struct DirNode {
     pub id: usize,
     pub parent_id: Option<usize>,
     pub name: String,
+    pub size: usize,
 }
 
 #[derive(Debug)]
@@ -38,12 +39,23 @@ impl NodeArena {
 
     pub fn add_dir(&mut self, parent_id: Option<usize>, name: String) -> usize {
         let id = self.elements.len();
+        let size = 0;
         self.elements.push(Node::DIR(DirNode {
             id,
             parent_id,
             name,
+            size,
         }));
         id
+    }
+
+    fn add_size_to_dir(&mut self, dir_id: usize, size: usize) {
+        if let Node::DIR(dir) = &mut self.elements[dir_id] {
+            dir.size = dir.size + size;
+            if let Some(parent_id) = dir.parent_id {
+                self.add_size_to_dir(parent_id, size);
+            }
+        }
     }
 
     pub fn add_file(&mut self, parent_id: usize, size: usize, name: String) -> usize {
@@ -54,6 +66,7 @@ impl NodeArena {
             size,
             name,
         }));
+        self.add_size_to_dir(parent_id, size);
         id
     }
 }
@@ -74,6 +87,7 @@ mod tests {
             assert_eq!(root_node.id, 0);
             assert_eq!(root_node.parent_id, None);
             assert_eq!(root_node.name, root_node_name);
+            assert_eq!(root_node.size, 0);
 
             let second_dir_name = String::from("second_dir");
             let second_dir_id = node_arena.add_dir(Some(root_node.id), second_dir_name.clone());
@@ -83,6 +97,7 @@ mod tests {
                 assert_eq!(second_dir.id, 1);
                 assert_eq!(second_dir.parent_id, Some(0));
                 assert_eq!(second_dir.name, second_dir_name);
+                assert_eq!(second_dir.size, 0);
 
                 let file_size = 100;
                 let file_name = String::from("file.txt");
@@ -96,6 +111,14 @@ mod tests {
                     assert_eq!(file.name, file_name);
                 } else {
                     assert!(false, "this has to be a file node");
+                }
+
+                if let Node::DIR(second_dir) = node_arena.node(second_dir_id) {
+                    assert_eq!(second_dir.size, 100);
+                }
+
+                if let Node::DIR(root_node) = node_arena.node(root_node_id) {
+                    assert_eq!(root_node.size, 100);
                 }
             } else {
                 assert!(false, "second_dir is a dir node");

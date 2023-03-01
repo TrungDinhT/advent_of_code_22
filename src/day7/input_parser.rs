@@ -2,6 +2,11 @@ use super::directory_tree::{Node, NodeArena};
 use itertools::Itertools;
 use std::fs;
 
+pub fn read_and_parse_input(path: &str) -> NodeArena {
+    let cmd_results = read_and_split_by_command(path);
+    parse_cmd_results(cmd_results)
+}
+
 enum Cmd {
     CD(String),
     LS(Vec<String>),

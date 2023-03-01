@@ -49,11 +49,19 @@ pub fn run(day: u8) {
         }
         6 => {
             println!(
-                "Day6: \nNumber of characters to be processed before first start-of-packet marker: {} \n \
+                "Day6:\n Number of characters to be processed before first start-of-packet marker: {} \n \
                 Number of characters to be processed before first start-of-message marker: {}",
                 day6::part1::find_marker_pos(),
                 day6::part2::find_marker_pos(),
             );
+        }
+        7 => {
+            println!(
+                "Day7:\n Sum of directory size each at most 100000 is: {}\n \
+                Smallest dir size to delete to be able to update: {}",
+                day7::part1::sum_dir_size_at_most_100kb(),
+                day7::part2::smallest_dir_size_to_delete(),
+            )
         }
         _ => {
             panic!("Unimplemented solution for day {}", day);

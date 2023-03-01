@@ -29,6 +29,7 @@ impl NodeArena {
         NodeArena { elements: vec![] }
     }
 
+    #[cfg(test)]
     pub fn len(&self) -> usize {
         self.elements.len()
     }
